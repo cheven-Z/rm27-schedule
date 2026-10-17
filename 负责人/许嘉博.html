@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>owner</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:#f5f6f8;color:#1f2328;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:#0b62c4;text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1400px;margin:0 auto;padding:24px 22px 70px}
+
+.topbar{background:#fff;border-bottom:1px solid #e3e6ea;padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:30}
+.logo{width:34px;height:34px;border-radius:9px;flex:0 0 34px;background:linear-gradient(140deg,#e60012,#94000c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+.topbar .ttl{font-weight:700;font-size:15px}
+.topbar .sub{color:#8a929c;font-size:12px}
+.topbar nav{display:flex;gap:6px;flex-wrap:wrap;margin-left:18px}
+.topbar nav a{padding:5px 12px;border-radius:8px;font-size:12.5px;color:#4a525c;border:1px solid #e3e6ea}
+.topbar nav a:hover{background:#f0f2f5;text-decoration:none}
+.topbar nav a.on{background:#1f2328;color:#fff;border-color:#1f2328}
+
+.tools{display:flex;gap:6px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.tools button,.tools label{border:1px solid #dde1e6;background:#fff;color:#3a424c;border-radius:8px;padding:5px 11px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.tools button:hover,.tools label:hover{background:#f0f2f5}
+.tools button.on{background:#e60012;color:#fff;border-color:#e60012}
+.tools button.warn{color:#9a6412;border-color:#f0dfae;background:#fffaf0}
+
+h1{font-size:22px;margin:0 0 4px}
+.lead{color:#656d76;font-size:13px;margin:0 0 20px}
+
+.card{background:#fff;border:1px solid #e3e6ea;border-radius:12px;overflow:hidden;margin-bottom:20px}
+.card > .hd{padding:13px 18px;border-bottom:1px solid #eef0f3;background:#fafbfc;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card > .hd h2{margin:0;font-size:14.5px;font-weight:650}
+.card > .hd .hint{margin-left:auto;color:#8a929c;font-size:11.5px}
+.card > .bd{padding:16px 18px}
+
+.banner{background:#fff8e5;border:1px solid #f0dfae;color:#7a5a12;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner button{border:1px solid currentColor;background:#fff;color:inherit;border-radius:7px;padding:3px 10px;font-size:12px;cursor:pointer;font-family:inherit;opacity:.85}
+.banner button:hover{opacity:1}
+
+.stats{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:20px}
+.stat b{display:block;font-size:23px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat span{font-size:11.5px;color:#8a929c}
+
+.grid{display:grid;gap:12px}
+.grid.arms{grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
+.grid.people{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
+.tile{border:1px solid #e3e6ea;border-radius:10px;padding:12px 14px;background:#fff;display:block;color:inherit;transition:.15s;border-left-width:4px}
+.tile:hover{border-color:#c9ced6;box-shadow:0 4px 14px rgba(20,30,45,.09);text-decoration:none;transform:translateY(-1px)}
+.tile .n{font-weight:650;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.tile .d{color:#8a929c;font-size:11.5px;margin-top:3px;min-height:17px}
+.tile .dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.tile .badge{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:999px;background:#f0f2f5;color:#656d76;margin-left:auto}
+.tile.empty{opacity:.62;border-left-color:#d5dae0}
+.tile.big{padding:16px 18px}
+.tile.big .n{font-size:15px}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-bottom:1px solid #eef0f3;background:#fff}
+.chip{border:1px solid #dde1e6;background:#fff;color:#4a525c;border-radius:999px;padding:4px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.chip:hover{border-color:#b9c0c9}
+.chip.on{color:#fff;border-color:transparent}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+
+.st{font-size:10.5px;padding:1px 8px;border-radius:999px;white-space:nowrap;font-weight:600}
+.st.done{background:#e7f7ee;color:#0d7a43}
+.st.doing{background:#e6f0fd;color:#1257a8}
+.st.delayed{background:#fdeaea;color:#b3161f}
+.st.plan{background:#f0f2f5;color:#656d76}
+.st.tbd{background:#fdf3e2;color:#9a6412}
+
+.vtl{padding:6px 18px 20px}
+.vtl-group{position:relative;padding-left:96px;padding-bottom:20px}
+.vtl-group::before{content:"";position:absolute;left:78px;top:8px;bottom:-6px;width:2px;background:#eceff3}
+.vtl-group:last-child::before{display:none}
+.vtl-date{position:absolute;left:0;top:2px;width:70px;text-align:right;font-weight:700;font-size:12.5px;font-variant-numeric:tabular-nums}
+.vtl-dot{position:absolute;left:72px;top:6px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid #e60012;z-index:2}
+.vtl-items{display:grid;gap:8px}
+.vtl-item{border:1px solid #e6e9ed;border-radius:9px;padding:10px 13px;background:#fff;cursor:pointer;transition:.15s;border-left:4px solid #ccc}
+.vtl-item:hover{border-color:#c9ced6;box-shadow:0 3px 10px rgba(20,30,45,.08)}
+.vtl-item .r1{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.vtl-item .nm{font-weight:600;font-size:13px}
+.vtl-item .arm{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:600}
+.vtl-item .r2{color:#8a929c;font-size:11.5px;margin-top:3px;font-variant-numeric:tabular-nums}
+.official{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;background:#fff4e5;color:#8a5410;border:1px solid #f5dfc0;border-radius:999px;padding:2px 10px;margin:0 6px 6px 0}
+.official.editable{cursor:pointer}
+.official.editable:hover{background:#e60012;color:#fff;border-color:#e60012}
+
+.gantt-scroll{overflow-x:auto}
+.gantt{min-width:1120px;position:relative;background:#fff}
+.grow{display:flex;border-bottom:1px solid #f0f2f5;position:relative}
+.grow:last-child{border-bottom:0}
+.glabel{width:240px;flex:0 0 240px;padding:9px 14px;border-right:1px solid #eef0f3;position:sticky;left:0;z-index:5;background:#fff;font-size:12.5px;display:flex;align-items:center;gap:8px}
+.gtrack{flex:1;position:relative;min-height:38px}
+.grow.head .glabel{color:#8a929c;font-size:11.5px}
+.grow.head .gtrack{min-height:36px}
+.grow.arm .glabel{background:#fafbfc;font-weight:650;font-size:12.5px}
+.grow.arm .gtrack{min-height:30px;background:#fcfdfe}
+.grow.arm .glabel .cnt{margin-left:auto;color:#8a929c;font-weight:400;font-size:11.5px}
+.gridv{position:absolute;inset:0;pointer-events:none;z-index:0}
+.gridv i{position:absolute;top:0;bottom:0;width:1px;background:#f2f4f7}
+.gridv i.q{background:#e7eaee}
+.tick{position:absolute;top:0;bottom:0;border-left:1px solid #f2f4f7;pointer-events:none}
+.tick.q{border-left-color:#e7eaee}
+.tick span{position:absolute;left:5px;top:8px;font-size:11px;color:#9aa2ac;white-space:nowrap}
+.tick.q span{color:#6b737d}
+.bar{position:absolute;top:50%;transform:translateY(-50%);height:16px;border-radius:5px;min-width:4px;cursor:pointer;box-shadow:0 1px 3px rgba(20,30,45,.18)}
+.bar:hover{filter:brightness(1.12);outline:2px solid #1f2328;outline-offset:1px}
+.bar.undef{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.5) 0 4px,transparent 4px 8px)}
+.gantt.editing .bar{cursor:grab;outline:1px dashed rgba(230,0,18,.6);outline-offset:1px}
+.gantt.editing .bar:hover{outline:2px solid #e60012}
+.today{position:absolute;top:0;bottom:0;width:2px;background:#12a150;z-index:6;pointer-events:none}
+.today b{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:#12a150;color:#fff;font-size:10px;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.msband .gtrack{min-height:78px;background:#fffaf9}
+.msband .glabel{background:#fafbfc;color:#e60012;font-weight:650}
+.ms{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:3}
+.ms i{display:block;width:11px;height:11px;background:#e60012;transform:rotate(45deg);margin:0 auto}
+.ms span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10.5px;color:#b3161f;background:#fdeaea;border:1px solid #f6cfd1;border-radius:999px;padding:1px 7px}
+.ms.up span{bottom:14px}
+.ms.down span{top:14px}
+.ms.edit{cursor:pointer}
+.ms.edit:hover span{background:#e60012;color:#fff}
+.mslines{position:absolute;inset:0;pointer-events:none;z-index:1}
+.mslines i{position:absolute;top:0;bottom:0;border-left:1px dashed #f0c2c5}
+
+.tlm-wrap{overflow-x:auto;overflow-y:hidden;background:#fff}
+.tlm{position:relative;background:#fff}
+.tlm-axis{position:absolute;left:150px;right:40px;height:3px;background:#e60012;border-radius:2px}
+.tlm-axis::after{content:"";position:absolute;right:-8px;top:-5px;border:7px solid transparent;border-left-color:#e60012}
+.tlm-root{position:absolute;left:14px;width:126px;padding:9px 10px;border-radius:10px;background:#1f2328;color:#fff;text-align:center;transform:translateY(-50%);z-index:6;box-shadow:0 4px 12px rgba(20,30,45,.2)}
+.tlm-root .rn{font-weight:700;font-size:13px}
+.tlm-root .rd{font-size:10.5px;opacity:.7;margin-top:1px}
+.tlm-stem{position:absolute;width:2px;background:#f0c2c5;z-index:1}
+.tlm-node{position:absolute;width:186px;z-index:4}
+.tlm-node .box{border:1px solid #e3e6ea;border-radius:9px;padding:9px 11px;background:#fff;cursor:pointer;transition:.15s;border-top:3px solid #ccc}
+.tlm-node .box:hover{box-shadow:0 4px 14px rgba(20,30,45,.12);border-color:#c9ced6}
+.tlm-node .dt{font-size:10.5px;color:#8a929c;font-variant-numeric:tabular-nums}
+.tlm-node .nm{font-weight:600;font-size:12.5px;line-height:1.4;margin:2px 0 4px}
+.tlm-node .mt{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tlm-node .own{font-size:10.5px;color:#656d76}
+.tlm-node .kids{margin-top:6px;padding-left:10px;border-left:2px solid #eef0f3;display:none}
+.tlm-node.open .kids{display:block}
+.tlm-node .kid{font-size:11.5px;color:#4a525c;margin-bottom:3px}
+.tlm-node .kid b{color:#8a929c;font-weight:400}
+.tlm-today{position:absolute;top:0;bottom:0;width:2px;background:#12a150;z-index:2}
+.tlm-today b{position:absolute;top:4px;left:50%;transform:translateX(-50%);background:#12a150;color:#fff;font-size:10px;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.tlm-legend{display:flex;gap:18px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid #eef0f3;background:#fafbfc;font-size:11.5px;color:#8a929c}
+.tlm-legend i{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+
+.org{display:grid;gap:16px}
+.org-g h3{margin:0 0 8px;font-size:13px;color:#e60012}
+.org-t{display:flex;flex-wrap:wrap;gap:8px}
+.org-p{font-size:12px;background:#f5f6f8;border:1px solid #e6e9ed;border-radius:7px;padding:3px 10px;color:#3a424c}
+.empty-tip{padding:40px 18px;text-align:center;color:#8a929c;font-size:13px}
+
+.drawer{position:fixed;right:0;top:0;bottom:0;width:404px;max-width:94vw;background:#fff;border-left:1px solid #dde1e6;box-shadow:-12px 0 36px rgba(20,30,45,.16);z-index:60;transform:translateX(103%);transition:transform .24s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.drawer .dh{padding:15px 18px;border-bottom:1px solid #eef0f3;background:#fafbfc;display:flex;gap:10px;align-items:flex-start}
+.drawer .dh h3{margin:0;font-size:15px;flex:1;line-height:1.45}
+.drawer .dh button{border:0;background:#eef0f3;color:#656d76;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:17px;line-height:1;flex:0 0 28px;padding:0}
+.drawer .dh button:hover{background:#e2e6ea;color:#1f2328}
+.drawer .db{padding:16px 18px;overflow-y:auto;flex:1}
+.frm{display:grid;gap:11px}
+.frm label{display:grid;gap:4px;font-size:12px;color:#8a929c}
+.frm input,.frm select,.frm textarea{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid #dde1e6;border-radius:7px;color:#1f2328;background:#fff;width:100%}
+.frm input:focus,.frm select:focus,.frm textarea:focus{outline:2px solid #bcd8fb;border-color:#8fbdf0;outline-offset:-1px}
+.frm textarea{resize:vertical;min-height:64px}
+.frm .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.btnrow{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.btnrow button{border:1px solid #dde1e6;background:#fff;color:#3a424c;border-radius:8px;padding:7px 14px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.btnrow button.danger{color:#b3161f;border-color:#f0c2c5}
+.btnrow button:hover{filter:brightness(.96)}
+.detail .kv{display:grid;grid-template-columns:78px 1fr;gap:8px 12px;font-size:12.5px;margin:0}
+.detail .kv dt{color:#8a929c}
+.detail .kv dd{margin:0}
+.tip{margin-top:16px;padding:11px 13px;border-radius:8px;background:#f5f6f8;border-left:3px solid #8a929c;font-size:12px;color:#656d76}
+
+/* 思维导图 */
+.mm-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:11px 18px;border-bottom:1px solid #eef0f3;background:#fafbfc;font-size:12px;color:#8a929c}
+.mm-bar .seg{display:inline-flex;background:#fff;border:1px solid #dde1e6;border-radius:8px;padding:2px;gap:2px}
+.mm-bar .seg button{border:0;background:transparent;color:#4a525c;font-family:inherit;font-size:12px;padding:4px 11px;border-radius:6px;cursor:pointer;transition:.15s}
+.mm-bar .seg button.on{background:#1f2328;color:#fff}
+.mm-bar .zoom{margin-left:auto;display:flex;gap:6px;align-items:center}
+.mm-bar .zoom button{border:1px solid #dde1e6;background:#fff;border-radius:7px;min-width:28px;height:26px;cursor:pointer;font-family:inherit;font-size:12px;line-height:1;color:#4a525c;padding:0 7px}
+.mm-bar .zoom button:hover{background:#f0f2f5}
+.mm-scroll{overflow:auto;background:#fff}
+.mm-zoom{position:relative}
+.mm-canvas{position:relative;transform-origin:0 0}
+.mm-svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.mm-node{position:absolute;box-sizing:border-box;border-radius:8px;font-size:12.5px;line-height:1.3}
+.mm-root{background:#1f2328;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:10px;box-shadow:0 4px 14px rgba(20,30,45,.2);text-align:center;padding:0 12px}
+.mm-group{display:flex;align-items:center;justify-content:center;font-weight:650;cursor:pointer;border:1px solid;user-select:none;transition:.15s}
+.mm-group:hover{filter:brightness(.95)}
+.mm-group .cnt{font-weight:400;opacity:.75;font-size:11px;margin-left:5px}
+.mm-task{background:#fff;border:1px solid #e3e6ea;border-left-width:4px;cursor:pointer;padding:0 10px;line-height:30px;height:32px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:.15s}
+.mm-task:hover{border-color:#c9ced6;box-shadow:0 3px 10px rgba(20,30,45,.1)}
+.mm-task .st{margin-left:7px;vertical-align:1px}
+.mm-detail{color:#8a929c;font-size:11.5px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
+.mm-empty{padding:44px 18px;text-align:center;color:#8a929c;font-size:13px}
+
+.tl-axis{position:absolute;height:2px;border-radius:2px}
+.tl-lane{position:absolute;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:8px;border:1px solid;font-size:12px;font-weight:650}
+.tl-card{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #e3e6ea;border-radius:8px;padding:5px 8px;cursor:pointer;transition:.15s;overflow:hidden}
+.tl-card:hover{border-color:#c9ced6;box-shadow:0 4px 14px rgba(20,30,45,.14);z-index:9}
+.tl-card .d{font-size:10px;color:#9aa2ac;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-card .n{font-size:12px;font-weight:600;line-height:1.25;margin:1px 0 3px;height:30px;overflow:hidden}
+.tl-card .m{display:flex;gap:5px;align-items:center;font-size:10px;color:#8a929c;white-space:nowrap;overflow:hidden}
+.tl-official{position:absolute;transform:translate(-50%,-50%);z-index:3}
+.tl-official i{display:block;width:10px;height:10px;background:#e60012;transform:rotate(45deg);margin:0 auto}
+.tl-official span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:#b3161f;background:#fdeaea;border:1px solid #f6cfd1;border-radius:999px;padding:0 6px}
+.tl-official.up span{bottom:13px}
+.tl-official.down span{top:13px}
+.tl-ruler{position:absolute;font-size:10.5px;color:#9aa2ac;white-space:nowrap}
+
+@media (max-width:820px){
+  .gantt{min-width:900px}
+  .glabel{width:170px;flex:0 0 170px}
+  .wrap{padding:16px 12px 60px}
+  .topbar nav{margin-left:0}
+}
+@media print{
+  .topbar nav,.chips,.tools,.banner{display:none}
+  body{background:#fff}
+  .card{border-color:#ccc;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="dh"><h3 id="d-title">—</h3><button id="d-close" aria-label="关闭">&times;</button></div>
+  <div class="db" id="d-body"></div>
+</aside>
+<script>window.PAGE_DATA={"mode":"owner","build":"20261017-164859","base":"../","single":false,"scope":{"name":"许嘉博","id":"许嘉博","type":"owner","roles":["硬件 · 硬件"]},"data":{"season":{"title":"27 赛季时间轴总体规划","team":"RoboMaster 战队 · 27 赛季","start":"2026-08-18","end":"2027-08-31","source":"27赛季时间轴总体规划.xmind","note":"数据由 XMind 导图逐条拆解，年份按 2026.8 - 2027.8 推算；原文出处保留在每条的 src 字段。"},"arms":[{"id":"infantry","name":"步兵","color":"#3ba3ff"},{"id":"chain","name":"串联腿步兵","color":"#14b8a6"},{"id":"heavy","name":"重装","color":"#f0a020"},{"id":"sentry","name":"哨兵","color":"#a855f7"},{"id":"drone","name":"无人机","color":"#06b6d4"},{"id":"dart","name":"飞镖","color":"#ef4444"},{"id":"misc","name":"通用 / 其他","color":"#8b98a5"}],"official":[{"name":"27 规则发布","start":"2026-10-15","end":"2026-10-15"},{"name":"报名","start":"2026-10-20","end":"2026-10-27"},{"name":"赛季规划文档提交","start":"2026-11-18","end":"2026-11-19"},{"name":"规则测评","start":"2026-12-16","end":"2026-12-17"},{"name":"中期进度文档","start":"2027-01-06","end":"2027-01-07"},{"name":"寒假","start":"2027-01-30","end":"2027-02-13"},{"name":"裁判系统考核 ①","start":"2027-03-01","end":"2027-03-03"},{"name":"完整形态 · 文档","start":"2027-03-01","end":"2027-03-04"},{"name":"完整形态 · 视频","start":"2027-03-08","end":"2027-03-10"},{"name":"联盟赛","start":"2027-03-21","end":"2027-03-21"},{"name":"裁判系统考核 ②","start":"2027-04-08","end":"2027-04-22"},{"name":"区域赛","start":"2027-05-01","end":"2027-06-30"},{"name":"国赛","start":"2027-08-01","end":"2027-08-31"}],"org":[{"group":"控制","teams":[{"name":"步兵","people":["张子晗","孙浩轩","苏峰"]},{"name":"飞镖","people":["唐磊"]},{"name":"无人机","people":["刘志","柳云飞"]},{"name":"哨兵","people":["安泽鸿","孙宇"]},{"name":"重装","people":["黄晨希","牛博源"]}]},{"group":"机械","teams":[{"name":"步兵","people":["郑欣然","冯玉豪"]},{"name":"串联腿","people":["方续尧"]},{"name":"飞镖","people":["刘鹏祥"]},{"name":"无人机","people":["张易幔"]},{"name":"哨兵","people":["白玉鹏"]},{"name":"重装","people":["赵一尘"]}]},{"group":"算法 · 视觉","teams":[{"name":"步兵哨兵","people":["何浩铭","赵雅馨"]},{"name":"飞镖","people":["李嘉伟"]},{"name":"无人机","people":["籍森昊","郭宇婷"]},{"name":"重装","people":["闫凯皓","睢锦辉"]},{"name":"能量机关","people":["曹嘉芮"]}]},{"group":"算法 · 导航","teams":[{"name":"导航","people":["江晨","石国荣"]},{"name":"决策","people":["任浩峰"]},{"name":"强化学习","people":["狄佳"]}]},{"group":"硬件","teams":[{"name":"硬件","people":["王旭斌","许嘉博","赵佳晖"]}]},{"group":"运营","teams":[{"name":"运营","people":["任鑫慧","李思微"]}]}],"tasks":[{"id":"T01","name":"导航组开始上车调试","arm":"misc","owners":[],"helpers":[],"start":"2026-08-18","end":null,"status":"doing","src":"8.18","note":""},{"id":"T02","name":"串联腿步兵出图","arm":"chain","owners":["李昊芮"],"helpers":[],"start":"2026-09-01","end":"2026-09-01","status":"done","src":"建队 9.1","note":"导图中标记为红色重点任务。"},{"id":"T03","name":"串联腿步兵加工装配","arm":"chain","owners":["方续尧"],"helpers":["郑欣然","张易幔","赵一尘","白玉鹏","冯玉豪","刘鹏祥"],"start":"2026-09-01","end":"2026-09-16","status":"done","src":"建队 9.1","note":"加工周期一周半（9.10），装配周期一周（9.16）。导图中标记为红色重点任务。"},{"id":"T04","name":"无人机样机开始设计制作","arm":"drone","owners":["张易幔"],"helpers":[],"start":"2026-09-01","end":null,"status":"doing","src":"建队 9.1","note":"目的：方便控制组进行飞控调试。"},{"id":"T05","name":"开始队内文化建设","arm":"misc","owners":[],"helpers":[],"start":"2026-09-01","end":null,"status":"doing","src":"建队 9.1","note":"含入队仪式。"},{"id":"T06","name":"同构狗洞哨兵开始绘制","arm":"sentry","owners":["高宇航"],"helpers":[],"start":"2026-09-02","end":"2026-09-23","status":"delayed","src":"任务安排 9.2","note":"原定两周（9.16）完成，9.16 记录未出图，延至 9.23，9.23 出图。"},{"id":"T07","name":"机械镖镖体开始绘制","arm":"dart","owners":["刘鹏祥"],"helpers":[],"start":"2026-09-02","end":"2026-09-15","status":"done","src":"任务安排 9.2","note":"原定一个月（10.2）。实际 9.11 一代出图，9.15 二代出图，完成本赛季机械镖研发。"},{"id":"T08","name":"第一代狗洞步兵开始研发","arm":"infantry","owners":["李凯一"],"helpers":[],"start":"2026-09-02","end":"2026-10-02","status":"doing","src":"任务安排 9.2","note":"原定研发周期一个月。9.8 方案定档：摇臂悬挂 + 折叠鹅颈 + 三摩擦发射机构 + 4310 拨盘。"},{"id":"T09","name":"中供小弹丸拨盘研发","arm":"infantry","owners":["郑欣然"],"helpers":[],"start":"2026-09-02","end":"2026-09-08","status":"done","src":"任务安排 9.2 / 大扭矩拨盘研发","note":"原定一周半至 9.8。9.8 综述：中供 3508 拨盘不再符合本赛季需求，负责人转小弹丸三摩擦枪管发射机构。"},{"id":"T10","name":"侧供 3508 拨盘研发","arm":"infantry","owners":["冯玉豪"],"helpers":[],"start":"2026-09-02","end":"2026-09-08","status":"done","src":"任务安排 9.2 / 大扭矩拨盘研发","note":"原定一周至 9.8。9.15 记录：3508 拨盘 20hz 不卡弹，新步兵最终选定 4310 拨盘。"},{"id":"T11","name":"实现小无人机的基本功能","arm":"drone","owners":["柳云飞","刘志"],"helpers":[],"start":"2026-09-02","end":"2026-09-20","status":"done","src":"任务安排 9.2","note":"9.20 记录：无人机基本功能实现。"},{"id":"T12","name":"实现机械臂的基本功能","arm":"heavy","owners":["牛博源","黄晨希"],"helpers":[],"start":"2026-09-02","end":"2026-09-18","status":"doing","src":"任务安排 9.2","note":"学习周期至 9.18。"},{"id":"T13","name":"学习无人机的强化学习","arm":"drone","owners":["籍森昊","郭宇婷"],"helpers":[],"start":"2026-09-02","end":"2026-09-20","status":"doing","src":"任务安排 9.2","note":"学习周期 9.2-9.20。"},{"id":"T14","name":"开发无线电解析波","arm":"misc","owners":["韩奇宏"],"helpers":[],"start":"2026-09-02","end":"2026-09-29","status":"done","src":"任务安排 9.2","note":"研发周期 9.2-9.29，9.29 记录研发完成。"},{"id":"T15","name":"机械臂重补","arm":"heavy","owners":["李滨鹏"],"helpers":[],"start":"2026-09-02","end":"2026-09-12","status":"done","src":"任务安排 9.2","note":"研发周期 9.2-9.12，9.12 记录研发完成。"},{"id":"T16","name":"重装切供拨盘研发","arm":"heavy","owners":["郭品精"],"helpers":[],"start":"2026-09-02","end":"2026-09-14","status":"done","src":"任务安排 9.2","note":"原定两周至 9.14。"},{"id":"T17","name":"第一代狗洞步兵方案定档","arm":"infantry","owners":["李凯一"],"helpers":[],"start":"2026-09-08","end":"2026-09-08","status":"done","src":"9.8","note":"方案：摇臂悬挂、折叠鹅颈、三摩擦发射机构、4310 拨盘。"},{"id":"T18","name":"三摩擦研发","arm":"infantry","owners":["郑欣然"],"helpers":[],"start":"2026-09-08","end":"2026-10-20","status":"delayed","src":"9.8","note":"原定两周至 9.22，9.22 记录研发周期延长至 10.20。"},{"id":"T19","name":"折叠鹅颈研发","arm":"infantry","owners":["白玉鹏"],"helpers":[],"start":"2026-09-08","end":"2026-09-18","status":"done","src":"9.8","note":"原定四天至 9.12，9.12 记录延期一周，9.18 完成。"},{"id":"T20","name":"第一代机械镖出图","arm":"dart","owners":["刘鹏祥"],"helpers":[],"start":"2026-09-11","end":"2026-09-11","status":"done","src":"9.11","note":""},{"id":"T21","name":"调试镖架完成命中","arm":"dart","owners":["唐磊"],"helpers":[],"start":"2026-09-11","end":"2026-09-18","status":"done","src":"9.11","note":"原定一周至 9.18，9.18 记录完成第一发机械镖命中。"},{"id":"T22","name":"图传控车开发","arm":"misc","owners":["孙浩轩","张子晗"],"helpers":[],"start":"2026-09-12","end":"2026-09-14","status":"done","src":"9.12","note":"原定两天至 9.14，9.14 记录开发完成。"},{"id":"T23","name":"重装拨盘出图","arm":"heavy","owners":["郭品精"],"helpers":[],"start":"2026-09-14","end":"2026-09-14","status":"done","src":"9.14","note":""},{"id":"T24","name":"重装拨盘开始加工","arm":"heavy","owners":["赵一尘"],"helpers":[],"start":"2026-09-14","end":"2026-09-20","status":"done","src":"9.14","note":"加工周期一周至 9.20。"},{"id":"T25","name":"第二代机械镖出图","arm":"dart","owners":["刘鹏祥"],"helpers":[],"start":"2026-09-15","end":"2026-09-15","status":"done","src":"9.15","note":"完成本赛季机械镖的研发。"},{"id":"T26","name":"4310 拨盘研发","arm":"infantry","owners":["冯玉豪"],"helpers":[],"start":"2026-09-15","end":"2026-09-22","status":"done","src":"9.15","note":"原定一周至 9.22。结果：20hz 供弹退弹七分钟不卡弹。遗留问题：测试机构整体 3D 打印，电机孔位固定不牢，外包拨盘电机固定件。"},{"id":"T27","name":"串联腿出车，交给控制组调试","arm":"chain","owners":["贠斌豪"],"helpers":["孙浩轩","张子晗","苏峰"],"start":"2026-09-16","end":"2026-09-16","status":"done","src":"9.16","note":"导图中标记为红色重点任务。"},{"id":"T28","name":"镖架上制导","arm":"dart","owners":["李嘉伟","唐磊"],"helpers":[],"start":"2026-09-18","end":"2026-10-07","status":"done","src":"9.18","note":"原定两周至 10.07。"},{"id":"T29","name":"第二架无人机装配","arm":"drone","owners":[],"helpers":[],"start":"2026-09-20","end":null,"status":"doing","src":"9.20","note":""},{"id":"T30","name":"接入无人机算法","arm":"drone","owners":["籍森昊","郭宇婷"],"helpers":[],"start":"2026-09-20","end":null,"status":"doing","src":"9.20 / 第二架无人机装配","note":""},{"id":"T31","name":"第二架无人机基本功能的实现","arm":"drone","owners":["柳云飞","刘志"],"helpers":[],"start":"2026-09-20","end":null,"status":"doing","src":"9.20 / 第二架无人机装配","note":"10.06 记录第二个机架自主飞行（已接入算法）。"},{"id":"T32","name":"同构龟哨出图","arm":"sentry","owners":["高宇航"],"helpers":[],"start":"2026-09-23","end":"2026-09-23","status":"done","src":"9.23","note":""},{"id":"T33","name":"同构龟哨开始加工","arm":"sentry","owners":["白玉鹏"],"helpers":["郑欣然","张易幔","赵一尘","方续尧","冯玉豪","刘鹏祥"],"start":"2026-09-23","end":"2026-10-01","status":"done","src":"9.23","note":"加工周期一周至 10.01。"},{"id":"T34","name":"队外项目","arm":"misc","owners":["冯玉豪","高振航","张建业"],"helpers":[],"start":"2026-09-24","end":null,"status":"doing","src":"9.24","note":"机械 冯玉豪 / 控制 高振航 / 算法 张建业。导图中研发周期只写了「细分主题 1」，未填具体时间。"},{"id":"T35","name":"龟哨加工结束，开始装配","arm":"sentry","owners":["张易幔"],"helpers":[],"start":"2026-10-01","end":"2026-10-04","status":"done","src":"10.1","note":"原定装配一周至 10.07，实际 10.04 完成，提前三天。情况说明：白玉鹏在组织加工期间表现一般，决定由张易幔作为哨兵装配的主要负责人。"},{"id":"T36","name":"重装拨盘调试结束","arm":"heavy","owners":["牛博源","黄晨希"],"helpers":[],"start":"2026-10-02","end":"2026-10-02","status":"done","src":"10.2","note":""},{"id":"T37","name":"龟哨开始走线","arm":"sentry","owners":["安泽鸿","孙宇"],"helpers":[],"start":"2026-10-04","end":"2026-10-10","status":"done","src":"10.4","note":"走线周期三天（10.06-10.07 休息）。"},{"id":"T38","name":"第二个机架自主飞行（接入算法）","arm":"drone","owners":[],"helpers":[],"start":"2026-10-06","end":"2026-10-06","status":"done","src":"10.6","note":""},{"id":"T39","name":"完成机械镖随机固定四中四","arm":"dart","owners":["李嘉伟","唐磊","刘鹏祥"],"helpers":[],"start":"2026-10-07","end":"2026-10-07","status":"done","src":"10.7","note":""},{"id":"T40","name":"制导镖设计","arm":"dart","owners":["刘鹏祥"],"helpers":[],"start":"2026-10-07","end":"2026-10-15","status":"doing","src":"10.7 / 制导镖项目开始","note":"原定两周至 10.15。"},{"id":"T41","name":"制导镖调试","arm":"dart","owners":["唐磊"],"helpers":[],"start":"2026-10-07","end":null,"status":"tbd","src":"10.7 / 制导镖项目开始","note":"导图中研发周期写「待定」。"},{"id":"T42","name":"制导镖视觉锁定","arm":"dart","owners":["李嘉伟"],"helpers":[],"start":"2026-10-07","end":null,"status":"tbd","src":"10.7 / 制导镖项目开始","note":"导图中研发周期写「待定」。"},{"id":"T43","name":"龟哨开始调试","arm":"sentry","owners":["安泽鸿","孙宇"],"helpers":[],"start":"2026-10-10","end":"2026-10-14","status":"done","src":"10.10","note":"调试周期四天至 10.14。要求：四天完成基本功能的调试。"},{"id":"T44","name":"龟哨完成调试","arm":"sentry","owners":["安泽鸿","孙宇"],"helpers":[],"start":"2026-10-14","end":"2026-10-15","status":"done","src":"10.14","note":"已完成基本功能调试，但还有一些小功能没有实现。10.15 记录调试结束。"},{"id":"T45","name":"项目重新规划（27 规则发布后）","arm":"misc","owners":["张文琪"],"helpers":[],"start":"2026-10-15","end":null,"status":"doing","src":"27 规则发布（10 月 15 日）","note":"27 规则发布后按新规则重新规划项目。"},{"id":"T46","name":"一代串联腿调试完毕","arm":"chain","owners":["贠斌豪"],"helpers":[],"start":"2026-10-16","end":"2026-10-16","status":"done","src":"10.16","note":""},{"id":"T47","name":"机械镖调试结束，开始调试制导镖","arm":"dart","owners":["唐磊"],"helpers":[],"start":"2026-10-16","end":null,"status":"doing","src":"10.16","note":""},{"id":"T48","name":"报名","arm":"misc","owners":[],"helpers":[],"start":"2026-10-20","end":"2026-10-27","status":"plan","src":"10.20-10.27","note":""}]}};</script>
+<script>
+(function(){
+  var P = window.PAGE_DATA || {};
+  var BASE = P.data, BUILD = P.build, SINGLE = !!P.single;
+  var M = SINGLE ? "index" : P.mode;          // 当前视图（单文件版会切换）
+  var S = SINGLE ? {} : (P.scope || {});      // 当前作用域
+  var RP = P.base || "";          // 相对根目录的前缀：根页面 ""，子目录页面 "../"
+  var KEY = "rm27-schedule-v1";
+  var DAY = 86400000;
+
+  var state = { edit:false, kind:null, id:null };
+  var mm = { view:"timeline", groupBy:"arm", showDetail:true, showNote:false, range:"tasks", zoom:1, collapsed:{} };
+  var dirty = false, storeOk = true, stale = null, G = null, filt = "all";
+
+  function pd(s){ return new Date(s + "T00:00:00Z"); }
+  function p2(n){ return (n < 10 ? "0" : "") + n; }
+  function iso(ms){ var t = new Date(ms); return t.getUTCFullYear() + "-" + p2(t.getUTCMonth()+1) + "-" + p2(t.getUTCDate()); }
+  function snapDay(ms){ return Math.round(ms / DAY) * DAY; }
+  function fmt(s){ if(!s) return "—"; var t = pd(s); return t.getUTCFullYear() + "." + p2(t.getUTCMonth()+1) + "." + p2(t.getUTCDate()); }
+  function fmtShort(s){ var t = pd(s); return (t.getUTCMonth()+1) + "." + t.getUTCDate(); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){
+    return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;"; }); }
+  function statusOf(k){ return ({done:"已完成",doing:"进行中",delayed:"已延期",plan:"计划中",tbd:"周期待定"})[k] || k; }
+  function today(){ var t = new Date(); return new Date(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate())); }
+  function endOf(t){ return t.end ? t.end : t.start; }
+  function daysBetween(a,b){ return Math.round((pd(b) - pd(a)) / DAY) + 1; }
+  function splitNames(v){ return String(v || "").split(/[、,，;；\s]+/).filter(Boolean); }
+  function clock(ts){ var t = new Date(ts); return p2(t.getHours()) + ":" + p2(t.getMinutes()); }
+  function arr(v){ return v == null ? [] : (Array.isArray(v) ? v : [v]); }
+
+  var D = BASE;
+
+  function readStore(){
+    try { var raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; }
+    catch(e){ storeOk = false; return null; }
+  }
+  function writeStore(){
+    if (!storeOk) return;
+    try { localStorage.setItem(KEY, JSON.stringify({ build:BUILD, savedAt:Date.now(), data:D })); }
+    catch(e){ storeOk = false; }
+  }
+  function dropStore(){ try { localStorage.removeItem(KEY); } catch(e){} }
+
+  (function initData(){
+    var st = readStore();
+    if (!st || !st.data) return;
+    if (st.build === BUILD) { D = st.data; dirty = true; }
+    else { stale = st; }
+  })();
+
+  function commit(){ dirty = true; writeStore(); render(); }
+  function armOf(id){ for (var i=0;i<D.arms.length;i++){ if(D.arms[i].id === id) return D.arms[i]; } return {id:id,name:id,color:"#8b98a5"}; }
+  function findTask(id){ for (var i=0;i<D.tasks.length;i++){ if (D.tasks[i].id === id) return D.tasks[i]; } return null; }
+  function findOfficial(n){ for (var i=0;i<D.official.length;i++){ if (D.official[i].name === n) return D.official[i]; } return null; }
+  function newId(){
+    var n = 1;
+    D.tasks.forEach(function(t){ var m = /^T(\d+)$/.exec(t.id); if (m) n = Math.max(n, +m[1] + 1); });
+    return "T" + p2(n);
+  }
+
+  /* ---------------- 单文件版：视图路由 ---------------- */
+  function scopeForArm(id){
+    var a = armOf(id);
+    return { type:"arm", id:id, name:a.name, color:a.color };
+  }
+  function scopeForOwner(name){
+    var roles = [];
+    D.org.forEach(function(g){
+      g.teams.forEach(function(tm){
+        if (tm.people.indexOf(name) >= 0) roles.push(g.group + " · " + tm.name);
+      });
+    });
+    return { type:"owner", id:name, name:name, roles:roles };
+  }
+  function go(kind, id){
+    if (kind === "index")  { M = "index";  S = {}; }
+    else if (kind === "season") { M = "season"; S = {}; }
+    else if (kind === "gantt")  { M = "gantt";  S = {}; }
+    else if (kind === "arm")    { M = "arm";    S = scopeForArm(id); }
+    else if (kind === "owner")  { M = "owner";  S = scopeForOwner(id); }
+    else return;
+    closeDrawer();
+    window.scrollTo(0, 0);
+    document.title = (M === "index" ? "总览" : M === "season" ? "赛季总时间轴" : M === "gantt" ? "兵种甘特图" : (M === "arm" ? "兵种 · " + S.name : "负责人 · " + S.name));
+    if (SINGLE) {
+      var h = "#" + M + (S.id ? ":" + encodeURIComponent(S.id) : "");
+      try { history.replaceState(null, "", h); } catch (e) { location.hash = h.slice(1); }
+    }
+    render();
+  }
+  function applyRoute(){
+    if (!SINGLE) return;
+    var h = "";
+    try { h = decodeURIComponent((location.hash || "").replace(/^#/, "")); } catch (e) { return; }
+    if (!h) return;
+    var i = h.indexOf(":");
+    var k = i < 0 ? h : h.slice(0, i);
+    var id = i < 0 ? "" : h.slice(i + 1);
+    if (k === "index" || k === "season" || k === "gantt") { M = k; S = {}; }
+    else if (k === "arm" && id && armOf(id).name !== id) { M = "arm"; S = scopeForArm(id); }
+    else if (k === "owner" && id) { M = "owner"; S = scopeForOwner(id); }
+    else { M = "index"; S = {}; }
+  }
+  function goAttr(kind, id){
+    if (SINGLE) return 'href="#" data-go="' + kind + ':' + esc(id) + '"';
+    var dir = (kind === "arm") ? "兵种/" : "负责人/";
+    return 'href="' + RP + dir + esc(id) + '.html"';
+  }
+  function viewAttr(kind){
+    if (SINGLE) return 'href="#" data-go="' + kind + '"';
+    var f = (kind === "season") ? "赛季总时间轴.html" : "兵种甘特图.html";
+    return 'href="' + RP + "总览/" + f + '"';
+  }
+
+  function bar(html){
+    document.getElementById("app").innerHTML = topbar() + '<div class="wrap">' + banner() + html + '</div>';
+  }
+  function banner(){
+    if (stale) {
+      return '<div class="banner">浏览器里还留着一份<b>上一次生成</b>时的修改（' + clock(stale.savedAt) +
+        '）。本次生成的数据更新，默认已忽略它。' +
+        '<button data-act="use-stale">改用那一份</button>' +
+        '<button data-act="drop-stale">丢弃</button></div>';
+    }
+    if (dirty) {
+      var st = readStore();
+      return '<div class="banner">正在使用<b>浏览器内的修改版本</b>' +
+        (st ? '（保存于 ' + clock(st.savedAt) + '）' : '') +
+        (storeOk ? '。改完记得点「导出 JSON」覆盖 数据.json。' : '　⚠ 浏览器存储不可用，修改只在本页有效，请务必导出。') +
+        '<button data-act="reset">恢复为文件里的数据</button></div>';
+    }
+    return "";
+  }
+  function topbar(){
+    var nav;
+    if (SINGLE) {
+      var cur = (M === "arm" || M === "owner") ? "index" : M;
+      nav = [["index","总览"],["season","赛季总时间轴"],["gantt","兵种甘特图"]].map(function(it){
+        return '<a href="#" data-go="' + it[0] + '"' + (cur === it[0] ? ' class="on"' : '') + '>' + it[1] + '</a>';
+      }).join("");
+    } else {
+      var HREF_HOME   = RP + "index.html";
+      var HREF_SEASON = RP + "总览/赛季总时间轴.html";
+      var HREF_GANTT  = RP + "总览/兵种甘特图.html";
+      var items = [[HREF_HOME,"总览"],[HREF_SEASON,"赛季总时间轴"],[HREF_GANTT,"兵种甘特图"]];
+      nav = items.map(function(it, i){
+        var on = (M === "index" && i === 0) ||
+                 (M === "season" && i === 1) ||
+                 (M === "gantt" && i === 2);
+        return '<a href="' + it[0] + '"' + (on ? ' class="on"' : '') + '>' + it[1] + '</a>';
+      }).join("");
+    }
+    var title = M === "index" ? D.season.team :
+                M === "owner" ? ("负责人 · " + S.name) :
+                M === "arm"   ? ("兵种 · " + S.name) : D.season.title;
+
+    var segBtn = function(act, label, on){
+      return '<button data-act="' + act + '" style="border:0;background:' + (on ? "#1f2328" : "transparent") +
+        ';color:' + (on ? "#fff" : "#4a525c") + ';font-family:inherit;font-size:12px;padding:4px 11px;border-radius:6px;cursor:pointer">' + label + '</button>';
+    };
+    var viewSeg = (M === "season")
+      ? '<div style="display:inline-flex;background:#fff;border:1px solid #dde1e6;border-radius:8px;padding:2px;gap:2px;margin-left:auto">' +
+          segBtn("view-timeline", "时间轴导图", mm.view === "timeline") +
+          segBtn("view-mind", "层级导图", mm.view === "mind") +
+        '</div>'
+      : "";
+
+    var tools = viewSeg + '<div class="tools">' +
+      '<button data-act="edit" class="' + (state.edit ? "on" : "") + '">' + (state.edit ? "✓ 编辑中" : "编辑") + '</button>' +
+      (state.edit && M !== "index" ? '<button data-act="add">+ 新增任务</button>' : '') +
+      (state.edit && M === "gantt" ? '<button data-act="add-off">+ 新增赛程节点</button>' : '') +
+      '<button data-act="export">导出 JSON</button>' +
+      '<label>导入<input type="file" id="imp" accept=".json" hidden></label>' +
+      (dirty ? '<button data-act="reset" class="warn">恢复默认</button>' : '') +
+      '</div>';
+
+    return '<div class="topbar"><div class="logo">RM</div>' +
+      '<div><div class="ttl">' + esc(title) + '</div>' +
+      '<div class="sub">' + esc(D.season.team) + ' · 数据源 ' + esc(D.season.source) + '</div></div>' +
+      '<nav>' + nav + '</nav>' + tools + '</div>';
+  }
+
+  function visible(t){ return filt === "all" || t.arm === filt; }
+  function chips(){
+    var h = '<div class="chips"><span style="color:#8a929c;font-size:12px;margin-right:2px">兵种筛选</span>';
+    h += '<button class="chip' + (filt === "all" ? " on" : "") + '" data-f="all"' + (filt === "all" ? ' style="background:#1f2328"' : "") + '>全部</button>';
+    D.arms.forEach(function(a){
+      var on = filt === a.id;
+      h += '<button class="chip' + (on ? " on" : "") + '" data-f="' + a.id + '"' + (on ? ' style="background:' + a.color + '"' : "") + '>' +
+           '<span class="dot" style="background:' + a.color + '"></span>' + esc(a.name) + '</button>';
+    });
+    return h + '</div>';
+  }
+  function bindChips(){
+    var box = document.querySelector(".chips"); if (!box) return;
+    box.onclick = function(e){
+      var b = e.target.closest(".chip"); if (!b) return;
+      filt = b.dataset.f; render();
+    };
+  }
+
+  function allPeople(){
+    var map = {};
+    function touch(name){
+      if (!Object.prototype.hasOwnProperty.call(map, name)) map[name] = { name:name, tasks:[], roles:[] };
+      return map[name];
+    }
+    D.tasks.forEach(function(t){
+      arr(t.owners).forEach(function(p){ var o = touch(p); if (o.tasks.indexOf(t) < 0) o.tasks.push(t); });
+      arr(t.helpers).forEach(function(p){ var o = touch(p); if (o.tasks.indexOf(t) < 0) o.tasks.push(t); });
+    });
+    D.org.forEach(function(g){
+      g.teams.forEach(function(tm){
+        tm.people.forEach(function(p){
+          var o = touch(p), role = g.group + " · " + tm.name;
+          if (o.roles.indexOf(role) < 0) o.roles.push(role);
+        });
+      });
+    });
+    return Object.keys(map).map(function(k){ return map[k]; })
+      .sort(function(a,b){ return b.tasks.length - a.tasks.length || a.name.localeCompare(b.name, "zh"); });
+  }
+
+  function renderIndex(){
+    var arms = D.arms.map(function(a){
+      var list = D.tasks.filter(function(t){ return t.arm === a.id; });
+      var seen = {};
+      list.forEach(function(t){ arr(t.owners).forEach(function(p){ seen[p] = 1; }); });
+      var n = Object.keys(seen).length;
+      return '<a class="tile" style="border-left-color:' + a.color + '" ' + goAttr("arm", a.id) + '>' +
+        '<div class="n"><span class="dot" style="background:' + a.color + '"></span>' + esc(a.name) +
+        '<span class="badge">' + list.length + ' 项</span></div>' +
+        '<div class="d">' + (n ? n + " 位负责人" : "暂无排期任务") + '</div></a>';
+    }).join("");
+
+    var people = allPeople();
+    var ptiles = people.map(function(p){
+      var n = p.tasks.length;
+      return '<a class="tile' + (n ? "" : " empty") + '" style="border-left-color:' + (n ? "#e60012" : "#d5dae0") + '" ' + goAttr("owner", p.name) + '>' +
+        '<div class="n">' + esc(p.name) + '<span class="badge">' + (n ? n + " 项" : "无排期") + '</span></div>' +
+        '<div class="d">' + esc(p.roles.join(" / ") || "—") + '</div></a>';
+    }).join("");
+
+    var org = D.org.map(function(g){
+      return '<div class="org-g"><h3>' + esc(g.group) + '</h3><div class="org-t">' +
+        g.teams.map(function(tm){
+          return tm.people.map(function(p){
+            return '<a class="org-p" ' + goAttr("owner", p) + '>' + esc(p) +
+                   '<span style="color:#9aa2ac"> · ' + esc(tm.name) + '</span></a>';
+          }).join("");
+        }).join("") + '</div></div>';
+    }).join("");
+
+    var withTask = people.filter(function(p){ return p.tasks.length; }).length;
+
+    bar('<h1>' + esc(D.season.title) + '</h1>' +
+      '<p class="lead">' + esc(D.season.note) + '</p>' +
+      '<div class="stats">' +
+        '<div class="stat"><b>' + D.tasks.length + '</b><span>排期任务</span></div>' +
+        '<div class="stat"><b>' + D.arms.length + '</b><span>兵种 / 分组</span></div>' +
+        '<div class="stat"><b>' + people.length + '</b><span>涉及人员</span></div>' +
+        '<div class="stat"><b>' + withTask + '</b><span>有排期任务</span></div>' +
+        '<div class="stat"><b>' + D.official.length + '</b><span>官方赛程节点</span></div>' +
+      '</div>' +
+      '<div class="card"><div class="hd"><h2>整体视图</h2></div><div class="bd"><div class="grid arms">' +
+        '<a class="tile big" style="border-left-color:#e60012" ' + viewAttr("season") + '><div class="n">整个赛季项目时间轴</div><div class="d">全部任务按时间顺序展开，含官方赛程节点</div></a>' +
+        '<a class="tile big" style="border-left-color:#0b62c4" ' + viewAttr("gantt") + '><div class="n">按兵种的甘特图</div><div class="d">横道图总览，按兵种分组，可看交叉与空档</div></a>' +
+      '</div></div></div>' +
+      '<div class="card"><div class="hd"><h2>按兵种进入</h2><div class="hint">每个兵种一条独立时间轴思维导图</div></div><div class="bd"><div class="grid arms">' + arms + '</div></div></div>' +
+      '<div class="card"><div class="hd"><h2>按负责人进入</h2><div class="hint">共 ' + people.length + ' 人，每人一条独立时间轴思维导图</div></div><div class="bd"><div class="grid people">' + ptiles + '</div></div></div>' +
+      '<div class="card"><div class="hd"><h2>队伍组织架构</h2><div class="hint">来自导图「分组」节点</div></div><div class="bd"><div class="org">' + org + '</div></div></div>');
+  }
+
+  function renderSeason(){
+    if (mm.view === "mind") { renderSeasonMind(); return; }
+    renderSeasonTimeline();
+  }
+
+  /* ---------------- 赛季总览 · 横向时间轴思维导图（泳道式） ---------------- */
+  function renderSeasonTimeline(){
+    var list = D.tasks.filter(visible);
+    if (!list.length) {
+      bar('<h1>整个赛季项目时间轴</h1><p class="lead">当前筛选下没有任务。</p>' +
+        '<div class="card">' + chips() + '<div class="mm-empty">该筛选下没有任务</div></div>');
+      bindChips(); return;
+    }
+
+    var W_ROOT = 152, W_LANE = 122, CARD_W = 168, CARD_H = 62;
+    var ROW = 72, LANE_GAP = 24, PAD = 20, AXIS_ZONE = 34, RULER_H = 40;
+    var xRoot = 14, xLane = xRoot + W_ROOT + 50, xAxis = xLane + W_LANE + 44;
+
+    var minD, maxD;
+    if (mm.range === "season") {
+      minD = pd(D.season.start); maxD = pd(D.season.end);
+    } else {
+      minD = pd(list[0].start); maxD = pd(endOf(list[0]));
+      list.forEach(function(t){
+        if (pd(t.start) < minD) minD = pd(t.start);
+        if (pd(endOf(t)) > maxD) maxD = pd(endOf(t));
+      });
+    }
+    minD = new Date(minD.getTime() - 5*DAY);
+    maxD = new Date(maxD.getTime() + 8*DAY);
+    var spanDays = Math.max(1, Math.round((maxD - minD) / DAY));
+    var innerW = Math.max(980, spanDays * 15);
+    var totalW = xAxis + innerW + 46;
+    mm.totalW = totalW;
+    function xOf(s){ return xAxis + Math.round((pd(s) - minD) / DAY / spanDays * innerW); }
+
+    var lanes = [{ key:"__official", name:"官方赛程", color:"#e60012", official:true, tasks:[] }];
+    D.arms.forEach(function(a){
+      var ts = list.filter(function(t){ return t.arm === a.id; })
+        .sort(function(x,z){ return pd(x.start) - pd(z.start); });
+      if (ts.length) lanes.push({ key:a.id, name:a.name, color:a.color, tasks:ts });
+    });
+
+    function path(x1, y1, x2, y2, color, w){
+      var mx = (x1 + x2) / 2;
+      return '<path d="M' + x1 + ' ' + y1 + ' C ' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2 +
+        '" fill="none" stroke="' + color + '" stroke-width="' + (w || 1.5) + '" stroke-linecap="round"/>';
+    }
+
+    var y = PAD + RULER_H, links = [], nodes = [], geom = [];
+    lanes.forEach(function(LN){
+      var top = y, upS = [], downS = [], placed = [];
+      if (!LN.official) {
+        LN.tasks.forEach(function(t, i){
+          var x = xOf(t.start);
+          var dir = (i % 2 === 0) ? "up" : "down";
+          var shelves = dir === "up" ? upS : downS;
+          var row = -1;
+          for (var r = 0; r < shelves.length; r++){
+            if (x - shelves[r] >= CARD_W + 12) { row = r; shelves[r] = x; break; }
+          }
+          if (row < 0) { shelves.push(x); row = shelves.length - 1; }
+          placed.push({ t:t, x:x, dir:dir, row:row });
+        });
+      }
+      var upH = upS.length * ROW, downH = downS.length * ROW;
+      var axisY = top + upH + CARD_H * 0 + 20;
+      var bottom = axisY + 20 + downH;
+      geom.push({ L:LN, top:top, bottom:bottom, mid:(top + bottom) / 2, axisY:axisY, placed:placed });
+      y = bottom + LANE_GAP;
+    });
+
+    var stackTop = PAD + RULER_H, stackBottom = y - LANE_GAP;
+    var rootMid = (stackTop + stackBottom) / 2;
+    var totalH = y - LANE_GAP + PAD;
+
+    nodes.push('<div class="mm-node mm-root" style="left:' + xRoot + 'px;top:' + (rootMid - 29) + 'px;width:' + W_ROOT +
+      'px;height:58px">' + esc(D.season.title) + '</div>');
+
+    geom.forEach(function(g){
+      var LN = g.L;
+      links.push(path(xRoot + W_ROOT, rootMid, xLane, g.mid, LN.color, LN.official ? 2.4 : 2));
+      nodes.push('<div class="tl-lane" style="left:' + xLane + 'px;top:' + (g.mid - 19) + 'px;width:' + W_LANE +
+        'px;height:38px;border-color:' + LN.color + ';background:' + LN.color + '1f;color:' + LN.color + '">' +
+        esc(LN.name) + (LN.official ? '' : '<span style="font-weight:400;opacity:.75;font-size:11px;margin-left:4px">' + LN.tasks.length + '</span>') + '</div>');
+
+      nodes.push('<div class="tl-axis" style="left:' + xAxis + 'px;top:' + g.axisY + 'px;width:' + innerW +
+        'px;background:' + LN.color + ';opacity:' + (LN.official ? '.5' : '.85') + '"></div>');
+      links.push(path(xLane + W_LANE, g.mid, xAxis, g.axisY, LN.color, 1.6));
+
+      if (LN.official) {
+        D.official.forEach(function(o, i){
+          var ox = xOf(o.start);
+          if (ox < xAxis - 2 || ox > xAxis + innerW + 2) return;
+          var up = (i % 2 === 0);
+          links.push('<path d="M' + ox + ' ' + g.axisY + ' L ' + ox + ' ' + (up ? g.axisY - 12 : g.axisY + 12) +
+            '" stroke="#f0c2c5" stroke-width="1.4"/>');
+          nodes.push('<div class="tl-official ' + (up ? "up" : "down") + '" style="left:' + ox + 'px;top:' + g.axisY +
+            'px" title="' + esc(o.name) + '"><i></i><span>' + esc(o.name) + '</span></div>');
+        });
+      } else {
+        g.placed.forEach(function(p){
+          var t = p.t;
+          var cardTop = p.dir === "up" ? (g.axisY - 16 - (p.row + 1) * ROW) : (g.axisY + 16 + p.row * ROW);
+          var stemTop = p.dir === "up" ? (cardTop + CARD_H) : g.axisY + 2;
+          var stemH = p.dir === "up" ? (g.axisY - cardTop - CARD_H) : (cardTop - g.axisY - 2);
+          links.push('<path d="M' + (p.x + CARD_W/2) + ' ' + g.axisY + ' L ' + (p.x + CARD_W/2) + ' ' +
+            (p.dir === "up" ? cardTop + CARD_H : cardTop) + '" stroke="#e6e9ed" stroke-width="1.4"/>');
+          nodes.push('<div class="tl-card" data-task="' + esc(t.id) + '" style="left:' + p.x + 'px;top:' + cardTop +
+            'px;width:' + CARD_W + 'px;height:' + CARD_H + 'px;border-top:3px solid ' + LN.color + '">' +
+            '<div class="d">' + fmtShort(t.start) + (t.end ? ' - ' + fmtShort(t.end) : ' 起') + '</div>' +
+            '<div class="n">' + esc(t.name) + '</div>' +
+            '<div class="m"><span class="st ' + t.status + '">' + statusOf(t.status) + '</span>' +
+            '<span>' + esc(arr(t.owners).length ? arr(t.owners).join("、") : "未指派") + '</span></div>' +
+            '</div>');
+        });
+      }
+    });
+
+    var ticks = [], y2 = minD.getUTCFullYear(), m2 = minD.getUTCMonth();
+    while (true) {
+      var t0 = new Date(Date.UTC(y2, m2, 1));
+      if (t0 > maxD) break;
+      if (t0 >= minD) {
+        var tx = xOf(iso(t0.getTime()));
+        ticks.push('<div style="position:absolute;left:' + tx + 'px;top:0;bottom:0;width:1px;background:#f2f4f7"></div>');
+        ticks.push('<div class="tl-ruler" style="left:' + (tx + 5) + 'px;top:' + (PAD + 6) + 'px">' +
+          (m2 === 0 ? y2 + "年" + (m2 + 1) + "月" : (m2 + 1) + "月") + '</div>');
+      }
+      m2++; if (m2 > 11) { m2 = 0; y2++; }
+    }
+
+    var rangeBar = '<div class="mm-bar">' +
+      '<span>时间范围</span>' +
+      '<div class="seg">' +
+        '<button data-act="mm-range-tasks" class="' + (mm.range !== "season" ? "on" : "") + '">聚焦任务期</button>' +
+        '<button data-act="mm-range-season" class="' + (mm.range === "season" ? "on" : "") + '">整个赛季</button>' +
+      '</div>' +
+      '<span style="margin-left:6px">点卡片打开详情</span>' +
+      '<div class="zoom">' +
+        '<button data-act="mm-out" title="缩小">－</button>' +
+        '<span style="min-width:44px;text-align:center;display:inline-block">' + Math.round(mm.zoom * 100) + '%</span>' +
+        '<button data-act="mm-in" title="放大">＋</button>' +
+        '<button data-act="mm-fit" title="适应宽度">适应</button>' +
+      '</div></div>';
+
+    var canvas = '<div class="mm-scroll"><div class="mm-zoom" style="width:' + (totalW * mm.zoom) + 'px;height:' + (totalH * mm.zoom) + 'px">' +
+      '<div class="mm-canvas" style="width:' + totalW + 'px;height:' + totalH + 'px;transform:scale(' + mm.zoom + ')">' +
+        ticks.join("") +
+        '<svg class="mm-svg" width="' + totalW + '" height="' + totalH + '">' + links.join("") + '</svg>' +
+        nodes.join("") +
+      '</div></div></div>';
+
+    bar('<h1>整个赛季项目时间轴</h1>' +
+      '<p class="lead">共 ' + list.length + ' 条任务。左侧根节点向右分出各兵种泳道，卡片按开始日期分布在时间轴两侧。' +
+      (state.edit ? "编辑模式下点卡片即可修改。" : "点卡片打开详情。") + '</p>' +
+      '<div class="card">' + chips() + rangeBar + canvas + '</div>');
+
+    bindChips();
+  }
+
+  /* ---------------- 赛季总览 · 思维导图（XMind 逻辑图式） ---------------- */
+  function mmGroups(){
+    var list = D.tasks.filter(visible);
+    var out = [];
+    if (mm.groupBy === "month") {
+      var bym = {};
+      list.forEach(function(t){
+        var k = String(t.start).slice(0, 7);
+        (bym[k] = bym[k] || []).push(t);
+      });
+      Object.keys(bym).sort().forEach(function(k, i){
+        var y = k.slice(0, 4), m = parseInt(k.slice(5, 7), 10);
+        out.push({ key:k, name:(m === 1 || i === 0 ? y + "年" : "") + m + "月", color:"#e60012",
+                   tasks:bym[k].slice().sort(function(a,b){ return pd(a.start) - pd(b.start); }) });
+      });
+    } else {
+      D.arms.forEach(function(a){
+        var ts = list.filter(function(t){ return t.arm === a.id; })
+          .sort(function(x,z){ return pd(x.start) - pd(z.start); });
+        if (ts.length) out.push({ key:a.id, name:a.name, color:a.color, tasks:ts });
+      });
+    }
+    return out;
+  }
+
+  function renderSeasonMind(){
+    var groups = mmGroups();
+    var W_ROOT = 180, W_G1 = 134, W_G2 = 306, W_G3 = 254;
+    var H_ROOT = 58, H_G1 = 40, H_T = 32;
+    var ROW = 40, GRP_GAP = 22, PAD = 26;
+    var xRoot = 16, xG1 = xRoot + W_ROOT + 58, xG2 = xG1 + W_G1 + 54, xG3 = xG2 + W_G2 + 54;
+    var totalW = mm.showDetail ? (xG3 + W_G3 + 44) : (xG2 + W_G2 + 44);
+
+    if (!groups.length) {
+      bar('<h1>整个赛季项目时间轴 · 思维导图</h1><p class="lead">当前筛选下没有任务。</p>' +
+        '<div class="card">' + chips() + '<div class="mm-empty">该筛选下没有任务</div></div>');
+      bindChips();
+      return;
+    }
+
+    var y = PAD, recs = [];
+    groups.forEach(function(g){
+      if (mm.collapsed[g.key]) {
+        var cy0 = y + ROW / 2;
+        recs.push({ g:g, gy:cy0, rows:[] });
+        y += ROW + GRP_GAP;
+        return;
+      }
+      var top = y, rows = [];
+      g.tasks.forEach(function(t){ rows.push({ t:t, cy: y + ROW / 2 }); y += ROW; });
+      var gy = (rows[0].cy + rows[rows.length - 1].cy) / 2;
+      recs.push({ g:g, gy:gy, rows:rows });
+      y += GRP_GAP;
+    });
+    var totalH = y - GRP_GAP + PAD;
+    var rootY = totalH / 2;
+    mm.totalW = totalW;
+
+    var links = [], nodes = [];
+    function path(x1, y1, x2, y2, color, w){
+      var mx = (x1 + x2) / 2;
+      return '<path d="M' + x1 + ' ' + y1 + ' C ' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2 +
+             '" fill="none" stroke="' + color + '" stroke-width="' + (w || 1.5) + '" stroke-linecap="round"/>';
+    }
+
+    nodes.push('<div class="mm-node mm-root" style="left:' + xRoot + 'px;top:' + (rootY - H_ROOT/2) + 'px;width:' + W_ROOT +
+      'px;height:' + H_ROOT + 'px">' + esc(D.season.title) + '</div>');
+
+    recs.forEach(function(r){
+      var g = r.g;
+      links.push(path(xRoot + W_ROOT, rootY, xG1, r.gy, "#c9ced6", 2));
+      nodes.push('<div class="mm-node mm-group" data-mmgroup="' + esc(g.key) + '" style="left:' + xG1 + 'px;top:' + (r.gy - H_G1/2) +
+        'px;width:' + W_G1 + 'px;height:' + H_G1 + 'px;border-color:' + g.color + ';background:' + g.color +
+        '1f;color:' + g.color + '">' + esc(g.name) + '<span class="cnt">' + g.tasks.length + '</span></div>');
+
+      r.rows.forEach(function(row){
+        var t = row.t;
+        links.push(path(xG1 + W_G1, r.gy, xG2, row.cy, g.color, 1.6));
+        nodes.push('<div class="mm-node mm-task" data-task="' + esc(t.id) + '" style="left:' + xG2 + 'px;top:' + (row.cy - H_T/2) +
+          'px;width:' + W_G2 + 'px;border-left-color:' + g.color + '" title="' + esc(t.name) + '">' +
+          esc(t.name) + '<span class="st ' + t.status + '">' + statusOf(t.status) + '</span></div>');
+
+        if (mm.showDetail) {
+          links.push(path(xG2 + W_G2, row.cy, xG3, row.cy, "#e3e6ea", 1.2));
+          var own = arr(t.owners).length ? arr(t.owners).join("、") : "未指派";
+          var per = fmtShort(t.start) + (t.end ? " - " + fmtShort(t.end) : " 起");
+          nodes.push('<div class="mm-node mm-detail" style="left:' + xG3 + 'px;top:' + (row.cy - 13) +
+            'px;width:' + W_G3 + 'px;height:26px">' + esc(own) + ' · ' + esc(per) +
+            (mm.showNote && t.note ? ' · ' + esc(t.note) : '') + '</div>');
+        }
+      });
+    });
+
+    var zoomBar = '<div class="mm-bar">' +
+      '<span>分组</span>' +
+      '<div class="seg">' +
+        '<button data-act="mm-arm" class="' + (mm.groupBy === "arm" ? "on" : "") + '">按兵种</button>' +
+        '<button data-act="mm-month" class="' + (mm.groupBy === "month" ? "on" : "") + '">按月份</button>' +
+      '</div>' +
+      '<div class="seg">' +
+        '<button data-act="mm-detail" class="' + (mm.showDetail ? "on" : "") + '">显示负责人</button>' +
+        '<button data-act="mm-note" class="' + (mm.showNote ? "on" : "") + '">带说明</button>' +
+      '</div>' +
+      '<span style="margin-left:6px">点分组节点可折叠</span>' +
+      '<div class="zoom">' +
+        '<button data-act="mm-out" title="缩小">－</button>' +
+        '<span style="min-width:44px;text-align:center;display:inline-block">' + Math.round(mm.zoom * 100) + '%</span>' +
+        '<button data-act="mm-in" title="放大">＋</button>' +
+        '<button data-act="mm-fit" title="适应宽度">适应</button>' +
+      '</div></div>';
+
+    var canvas = '<div class="mm-scroll"><div class="mm-zoom" style="width:' + (totalW * mm.zoom) + 'px;height:' + (totalH * mm.zoom) + 'px">' +
+      '<div class="mm-canvas" style="width:' + totalW + 'px;height:' + totalH + 'px;transform:scale(' + mm.zoom + ')">' +
+        '<svg class="mm-svg" width="' + totalW + '" height="' + totalH + '">' + links.join("") + '</svg>' +
+        nodes.join("") +
+      '</div></div></div>';
+
+    bar('<h1>整个赛季项目时间轴 · 思维导图</h1>' +
+      '<p class="lead">共 ' + D.tasks.filter(visible).length + ' 条任务。左侧为根节点，向右层层展开；点任务节点打开详情，'+ 
+      (state.edit ? '编辑模式下可直接改。' : '点右上角「编辑」可改。') + '</p>' +
+      '<div class="card">' + chips() + zoomBar + canvas + '</div>');
+
+    bindChips();
+    document.querySelectorAll("[data-mmgroup]").forEach(function(el){
+      el.onclick = function(){ mm.collapsed[el.dataset.mmgroup] = !mm.collapsed[el.dataset.mmgroup]; render(); };
+    });
+  }
+
+  function renderGantt(title, lead){
+    var minD = pd(D.season.start), maxD = pd(D.season.end);
+    D.tasks.forEach(function(t){
+      if (pd(t.start) < minD) minD = pd(t.start);
+      var e = pd(endOf(t)); if (e > maxD) maxD = e;
+    });
+    D.official.forEach(function(o){
+      if (pd(o.start) < minD) minD = pd(o.start);
+      if (pd(o.end) > maxD) maxD = pd(o.end);
+    });
+    minD = new Date(minD.getTime() - 6*DAY);
+    maxD = new Date(maxD.getTime() + 6*DAY);
+    G = { min:minD.getTime(), max:maxD.getTime() };
+    var span = G.max - G.min;
+    function pc(s){ return Math.max(0, Math.min(100, (pd(s) - G.min) / span * 100)); }
+
+    var ticks = [], y = minD.getUTCFullYear(), m = minD.getUTCMonth();
+    var ey = maxD.getUTCFullYear(), em = maxD.getUTCMonth(), first = true;
+    while (y < ey || (y === ey && m <= em)) {
+      var t0 = new Date(Date.UTC(y, m, 1));
+      ticks.push({ left: pc(iso(t0.getTime())), label: (m === 0 || first ? y + "年" + (m+1) + "月" : (m+1) + "月"), q: (m % 3 === 0 || first) });
+      first = false; m++; if (m > 11) { m = 0; y++; }
+    }
+    var grid = '<div class="gridv">' + ticks.map(function(t){
+      return '<i class="' + (t.q ? "q" : "") + '" style="left:' + t.left + '%"></i>'; }).join("") + '</div>';
+
+    var head = '<div class="grow head"><div class="glabel">任务 / 兵种</div><div class="gtrack">' + grid +
+      ticks.map(function(t){
+        return '<div class="tick ' + (t.q ? "q" : "") + '" style="left:' + t.left + '%"><span>' + esc(t.label) + '</span></div>';
+      }).join("") + '</div></div>';
+
+    var msLines = D.official.map(function(o){ return '<i style="left:' + pc(o.start) + '%"></i>'; }).join("");
+    var ms = D.official.map(function(o, i){
+      return '<div class="ms ' + (i % 2 === 0 ? "up" : "down") + (state.edit ? " edit" : "") + '" data-off="' + esc(o.name) + '" ' +
+        'style="left:' + pc(o.start) + '%" title="' + esc(o.name) + '"><i></i><span>' + esc(o.name) + '</span></div>';
+    }).join("");
+    var band = '<div class="grow msband"><div class="glabel">官方赛程</div><div class="gtrack">' + grid +
+      '<div class="mslines">' + msLines + '</div>' + ms + '</div></div>';
+
+    var rows = "";
+    D.arms.forEach(function(a){
+      var list = D.tasks.filter(function(t){ return t.arm === a.id; })
+        .sort(function(x,z){ return pd(x.start) - pd(z.start); });
+      if (!list.length) return;
+      rows += '<div class="grow arm"><div class="glabel"><span style="width:9px;height:9px;border-radius:50%;background:' + a.color + ';display:inline-block"></span>' +
+        esc(a.name) + '<span class="cnt">' + list.length + ' 项</span></div><div class="gtrack">' + grid + '</div></div>';
+      list.forEach(function(t){
+        var L = pc(t.start), R = pc(endOf(t));
+        var W = Math.max(0.6, R - L);
+        rows += '<div class="grow"><div class="glabel">' +
+          '<span data-task="' + esc(t.id) + '" style="cursor:pointer">' + esc(t.name) + '</span>' +
+          '</div><div class="gtrack">' + grid +
+          '<div class="bar' + (t.end ? "" : " undef") + '" data-task="' + esc(t.id) + '" style="left:' + L + '%;width:' + W +
+          '%;background:' + a.color + '" title="' + esc(t.name) + ' ｜ ' + fmt(t.start) + ' → ' + (t.end ? fmt(t.end) : "未定") + '"></div></div></div>';
+      });
+    });
+
+    bar('<h1>' + esc(title) + '</h1><p class="lead">' + lead + '</p>' +
+      '<div class="card"><div class="hd"><h2>横道图</h2><div class="hint">' +
+      (state.edit ? "拖动色条两端改起止日期，拖中间整体平移" : "斜纹条表示周期未定 · 红色菱形为官方赛程节点 · 绿线为今天") +
+      '</div></div>' +
+      '<div class="gantt-scroll"><div class="gantt' + (state.edit ? " editing" : "") + '">' + head + band + rows + '</div></div>' +
+      '<div class="tlm-legend"><i><span style="display:inline-block;width:18px;height:9px;border-radius:3px;background:#3ba3ff"></span>任务工期</i>' +
+      '<i>◆ 官方赛程节点</i><i>▨ 周期未定</i><i>┊ 今天</i></div></div>');
+
+    var g = document.querySelector(".gantt");
+    if (!g) return;
+    var td = today();
+    if (td.getTime() >= G.min && td.getTime() <= G.max) {
+      var ov = document.createElement("div");
+      ov.innerHTML = '<div class="today" style="left:calc(240px + (100% - 240px) * ' + pc(iso(td.getTime())) + ' / 100)"><b>今天</b></div>';
+      g.appendChild(ov);
+    }
+    g.querySelectorAll(".bar").forEach(function(el){
+      var t = findTask(el.dataset.task);
+      if (t) bindBar(el, t);
+    });
+    g.querySelectorAll(".ms").forEach(function(el){
+      el.onclick = function(){ if (state.edit) openDrawer("official", el.dataset.off); };
+    });
+  }
+
+  function bindBar(el, t){
+    el.onclick = function(ev){ ev.stopPropagation(); openDrawer("task", t.id); };
+    el.onmousedown = function(ev){
+      if (!state.edit || !G) return;
+      ev.preventDefault(); ev.stopPropagation();
+      var track = el.parentNode;
+      var tr = track.getBoundingClientRect();
+      if (!tr.width) return;
+      var br = el.getBoundingClientRect();
+      var mode = "move";
+      if (ev.clientX - br.left <= 10) mode = "start";
+      else if (br.right - ev.clientX <= 10) mode = "end";
+
+      var span = G.max - G.min;
+      var msPerPx = span / tr.width;
+      var s0 = pd(t.start).getTime();
+      var e0 = pd(endOf(t)).getTime();
+      if (e0 < s0) e0 = s0;
+      var x0 = ev.clientX, moved = false;
+
+      document.body.style.userSelect = "none";
+      function onMove(e2){
+        var dx = (e2.clientX - x0) * msPerPx;
+        if (Math.abs(e2.clientX - x0) > 2) moved = true;
+        var ns = s0, ne = e0;
+        if (mode === "move") { ns = snapDay(s0 + dx); ne = snapDay(e0 + dx); }
+        else if (mode === "start") { ns = Math.min(snapDay(s0 + dx), e0); }
+        else { ne = Math.max(snapDay(e0 + dx), s0); }
+        if (ne < ns) ne = ns;
+        var L = (ns - G.min) / span * 100, R = (ne - G.min) / span * 100;
+        el.style.left = L + "%";
+        el.style.width = Math.max(0.6, R - L) + "%";
+        el.dataset.ns = iso(ns);
+        el.dataset.ne = iso(ne);
+      }
+      function onUp(){
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+        document.body.style.userSelect = "";
+        if (!moved) return;
+        t.start = el.dataset.ns || t.start;
+        t.end = el.dataset.ne || t.end;
+        if (pd(t.end) < pd(t.start)) t.end = t.start;
+        commit();
+        openDrawer("task", t.id);
+      }
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    };
+  }
+
+  function scopeTasks(){
+    return D.tasks.filter(function(t){
+      if (S.type === "arm") return t.arm === S.id;
+      return arr(t.owners).indexOf(S.id) >= 0 || arr(t.helpers).indexOf(S.id) >= 0;
+    }).sort(function(a,b){ return pd(a.start) - pd(b.start); });
+  }
+
+  function renderScope(){
+    var tasks = scopeTasks();
+    var roles = arr(S.roles).length ? '<p class="lead">分工：' + esc(arr(S.roles).join("　|　")) + '</p>' : "";
+
+    var lst = tasks.map(function(t){
+      var a = armOf(t.arm);
+      return '<div class="vtl-item" data-task="' + esc(t.id) + '" style="border-left-color:' + a.color + '">' +
+        '<div class="r1"><span class="nm">' + esc(t.name) + '</span>' +
+        '<span class="arm" style="background:' + a.color + '1f;color:' + a.color + '">' + esc(a.name) + '</span>' +
+        '<span class="st ' + t.status + '">' + statusOf(t.status) + '</span></div>' +
+        '<div class="r2">' + fmt(t.start) + ' → ' + (t.end ? fmt(t.end) : "未定") +
+        (arr(t.owners).length ? "　负责人：" + esc(arr(t.owners).join("、")) : "") + '</div></div>';
+    }).join("");
+
+    if (!tasks.length) {
+      bar('<h1>' + esc(S.name) + '</h1>' + roles +
+        '<p class="lead">当前数据里没有与「' + esc(S.name) + '」直接关联的排期任务。</p>' +
+        '<div class="card"><div class="empty-tip">开启右上角「编辑」后，可用「+ 新增任务」补上。</div></div>');
+      return;
+    }
+
+    var minD = pd(tasks[0].start), maxD = pd(endOf(tasks[0]));
+    tasks.forEach(function(t){
+      if (pd(t.start) < minD) minD = pd(t.start);
+      if (pd(endOf(t)) > maxD) maxD = pd(endOf(t));
+    });
+    minD = new Date(minD.getTime() - 4*DAY);
+    maxD = new Date(maxD.getTime() + 12*DAY);
+    var spanDays = Math.max(1, Math.round((maxD - minD) / DAY));
+    var padL = 168, padR = 46, cardW = 186, cardH = 96, gapX = 14;
+    var innerW = Math.max(1100, spanDays * 4.6);
+    var W = padL + innerW + padR;
+    function xOf(s){ return padL + Math.round((pd(s) - minD) / DAY / spanDays * innerW); }
+
+    var up = [], down = [];
+    var placed = tasks.map(function(t, i){
+      var x = xOf(t.start);
+      var dir = (i % 2 === 0) ? "up" : "down";
+      var lanes = dir === "up" ? up : down;
+      var row = -1;
+      for (var r = 0; r < lanes.length; r++){
+        if (x - lanes[r] >= cardW + gapX) { row = r; lanes[r] = x; break; }
+      }
+      if (row < 0) { lanes.push(x); row = lanes.length - 1; }
+      return { t:t, x:x, dir:dir, row:row };
+    });
+
+    var bandH = 132;
+    var axisY = up.length * bandH + 26;
+    var H = axisY + down.length * bandH + 30;
+
+    var ticks = [], y = minD.getUTCFullYear(), m = minD.getUTCMonth();
+    while (true) {
+      var t0 = new Date(Date.UTC(y, m, 1));
+      if (t0 > maxD) break;
+      if (t0 >= minD) {
+        var tx = xOf(iso(t0.getTime()));
+        ticks.push('<div style="position:absolute;left:' + tx + 'px;top:' + (axisY-4) + 'px;width:1px;height:9px;background:#d5dae0"></div>' +
+          '<div style="position:absolute;left:' + (tx+4) + 'px;top:' + (axisY+8) + 'px;font-size:10.5px;color:#9aa2ac;white-space:nowrap">' +
+          (m === 0 ? y + "年" + (m+1) + "月" : (m+1) + "月") + '</div>');
+      }
+      m++; if (m > 11) { m = 0; y++; }
+    }
+
+    var nodes = placed.map(function(p){
+      var t = p.t, a = armOf(t.arm);
+      var top = p.dir === "up" ? (axisY - (p.row + 1) * bandH - 4) : (axisY + 30 + p.row * bandH);
+      var stemTop = p.dir === "up" ? (top + cardH - 2) : (axisY + 3);
+      var stemH = p.dir === "up" ? (axisY - top - cardH + 2) : (top - axisY - 3);
+
+      var kids = '<div class="kid"><b>负责人 </b>' + (arr(t.owners).length ? esc(arr(t.owners).join("、")) : "—") + '</div>';
+      if (arr(t.helpers).length) kids += '<div class="kid"><b>参与 </b>' + esc(arr(t.helpers).join("、")) + '</div>';
+      kids += '<div class="kid"><b>周期 </b>' + fmt(t.start) + ' → ' + (t.end ? fmt(t.end) : "未定") + '</div>';
+      kids += '<div class="kid"><b>出处 </b>' + esc(t.src) + '</div>';
+      if (t.note) kids += '<div class="kid" style="color:#8a929c"><b>说明 </b>' + esc(t.note) + '</div>';
+
+      return '<div class="tlm-stem" style="left:' + (p.x + cardW/2) + 'px;top:' + stemTop + 'px;height:' + Math.max(2, stemH) + 'px"></div>' +
+        '<div class="tlm-node" style="left:' + p.x + 'px;top:' + top + 'px">' +
+        '<div class="box" data-task="' + esc(t.id) + '" style="border-top-color:' + a.color + '">' +
+        '<div class="dt">' + fmtShort(t.start) + ' 起　' + (t.end ? fmtShort(t.end) + ' 止' : "未定") + '</div>' +
+        '<div class="nm">' + esc(t.name) + '</div>' +
+        '<div class="mt"><span class="st ' + t.status + '">' + statusOf(t.status) + '</span>' +
+        '<span class="own">' + (arr(t.owners).length ? esc(arr(t.owners).join("、")) : "—") + '</span></div>' +
+        '<div class="kids">' + kids + '</div>' +
+        '</div></div>';
+    }).join("");
+
+    var td = today();
+    var tdLine = (td >= minD && td <= maxD)
+      ? '<div class="tlm-today" style="left:' + xOf(iso(td.getTime())) + 'px;top:0;height:' + H + 'px"><b>今天</b></div>' : "";
+
+    var tl = '<div class="tlm-wrap"><div class="tlm" style="width:' + W + 'px;height:' + H + 'px">' +
+      '<div class="tlm-axis" style="top:' + axisY + 'px"></div>' + ticks.join("") + tdLine +
+      '<div class="tlm-root" style="top:' + axisY + 'px">' +
+        '<div class="rn">' + esc(S.name) + '</div>' +
+        '<div class="rd">' + (S.type === "arm" ? "兵种" : "负责人") + ' · ' + tasks.length + ' 项任务</div>' +
+      '</div>' + nodes + '</div></div>';
+
+    bar('<h1>' + esc(S.name) + '</h1>' + roles +
+      '<p class="lead">时间轴思维导图 —— 以「' + esc(S.name) + '」为根节点，' + tasks.length +
+      ' 条任务按开始日期分布在时间轴两侧。' + (state.edit ? "点卡片打开编辑面板。" : "点卡片展开子节点。") + '</p>' +
+      '<div class="card"><div class="hd"><h2>时间轴思维导图</h2><div class="hint">横向滚动 · 点卡片打开面板</div></div>' +
+      tl +
+      '<div class="tlm-legend"><i>━ 时间轴</i><i>□ 任务节点</i><i>┊ 今天</i><i>点节点打开详情</i></div></div>' +
+      '<div class="card"><div class="hd"><h2>任务明细</h2><div class="hint">共 ' + tasks.length + ' 项</div></div>' +
+      '<div class="vtl">' + lst + '</div></div>');
+  }
+
+  function openDrawer(kind, key){
+    state.kind = kind; state.id = key;
+    renderDrawer();
+    document.getElementById("drawer").classList.add("open");
+    document.getElementById("drawer").setAttribute("aria-hidden", "false");
+  }
+  function closeDrawer(){
+    document.getElementById("drawer").classList.remove("open");
+    document.getElementById("drawer").setAttribute("aria-hidden", "true");
+    state.kind = null; state.id = null;
+  }
+  function renderDrawer(){
+    if (!state.kind) return;
+    var titleEl = document.getElementById("d-title"), body = document.getElementById("d-body");
+
+    if (state.kind === "task") {
+      var t = findTask(state.id);
+      if (!t) { closeDrawer(); return; }
+      titleEl.textContent = state.edit ? "编辑任务" : t.name;
+      body.innerHTML = state.edit ? taskForm(t) : taskDetail(t);
+      if (state.edit) bindTaskForm(t, body);
+    } else {
+      var o = findOfficial(state.id);
+      if (!o) { closeDrawer(); return; }
+      titleEl.textContent = state.edit ? "编辑赛程节点" : o.name;
+      body.innerHTML = state.edit ? offForm(o) : ('<div class="detail"><dl class="kv">' +
+        '<dt>名称</dt><dd>' + esc(o.name) + '</dd>' +
+        '<dt>开始</dt><dd>' + fmt(o.start) + '</dd>' +
+        '<dt>结束</dt><dd>' + fmt(o.end) + '</dd>' +
+        '<dt>时长</dt><dd>' + daysBetween(o.start, o.end) + ' 天</dd></dl></div>');
+      if (state.edit) bindOffForm(o, body);
+    }
+  }
+  function taskDetail(t){
+    var a = armOf(t.arm);
+    var dur = t.end ? (daysBetween(t.start, t.end) + " 天") : "未定";
+    return '<div class="detail"><dl class="kv">' +
+      '<dt>兵种</dt><dd><span style="color:' + a.color + '">●</span> ' + esc(a.name) + '</dd>' +
+      '<dt>主要负责人</dt><dd>' + (arr(t.owners).length ? esc(arr(t.owners).join("、")) : "—") + '</dd>' +
+      '<dt>参与人员</dt><dd>' + (arr(t.helpers).length ? esc(arr(t.helpers).join("、")) : "—") + '</dd>' +
+      '<dt>起止</dt><dd>' + fmt(t.start) + ' → ' + (t.end ? fmt(t.end) : "未定") + '（' + dur + '）</dd>' +
+      '<dt>状态</dt><dd><span class="st ' + t.status + '">' + statusOf(t.status) + '</span></dd>' +
+      '<dt>导图出处</dt><dd>' + esc(t.src) + '</dd>' +
+      (t.note ? '<dt>说明</dt><dd>' + esc(t.note) + '</dd>' : '') +
+      '</dl></div><div class="tip">点右上角「编辑」即可修改这条任务。</div>';
+  }
+  function taskForm(t){
+    var opts = D.arms.map(function(a){
+      return '<option value="' + esc(a.id) + '"' + (a.id === t.arm ? " selected" : "") + '>' + esc(a.name) + '</option>';
+    }).join("");
+    var so = ["done","doing","delayed","plan","tbd"].map(function(k){
+      return '<option value="' + k + '"' + (k === t.status ? " selected" : "") + '>' + statusOf(k) + '</option>';
+    }).join("");
+    return '<div class="frm">' +
+      '<label>任务名称<input data-field="name" value="' + esc(t.name) + '"></label>' +
+      '<div class="row2">' +
+        '<label>兵种<select data-field="arm">' + opts + '</select></label>' +
+        '<label>状态<select data-field="status">' + so + '</select></label>' +
+      '</div>' +
+      '<div class="row2">' +
+        '<label>开始日期<input type="date" data-field="start" value="' + esc(t.start) + '"></label>' +
+        '<label>结束日期<input type="date" data-field="end" value="' + esc(t.end || "") + '"></label>' +
+      '</div>' +
+      '<label>主要负责人（顿号分隔）<input data-field="owners" value="' + esc(arr(t.owners).join("、")) + '"></label>' +
+      '<label>参与人员（顿号分隔）<input data-field="helpers" value="' + esc(arr(t.helpers).join("、")) + '"></label>' +
+      '<label>导图出处<input data-field="src" value="' + esc(t.src) + '"></label>' +
+      '<label>说明<textarea data-field="note">' + esc(t.note) + '</textarea></label>' +
+      '</div>' +
+      '<div class="btnrow"><button class="danger" data-act="del-task">删除这条任务</button>' +
+      '<button data-act="close">完成</button></div>';
+  }
+  function offForm(o){
+    return '<div class="frm">' +
+      '<label>节点名称<input data-field="name" value="' + esc(o.name) + '"></label>' +
+      '<div class="row2">' +
+        '<label>开始<input type="date" data-field="start" value="' + esc(o.start) + '"></label>' +
+        '<label>结束<input type="date" data-field="end" value="' + esc(o.end) + '"></label>' +
+      '</div></div>' +
+      '<div class="btnrow"><button class="danger" data-act="del-off">删除这个节点</button>' +
+      '<button data-act="close">完成</button></div>';
+  }
+  function bindTaskForm(t, box){
+    box.querySelectorAll("[data-field]").forEach(function(el){
+      var f = el.dataset.field;
+      var ev = (el.tagName === "SELECT" || el.type === "date") ? "change" : "input";
+      el.addEventListener(ev, function(){
+        if (f === "owners" || f === "helpers") t[f] = splitNames(el.value);
+        else if (f === "end") t.end = el.value || null;
+        else t[f] = el.value;
+        dirty = true; writeStore(); render();
+        document.getElementById("d-title").textContent = t.name;
+      });
+    });
+    var del = box.querySelector('[data-act="del-task"]');
+    if (del) del.onclick = function(){
+      if (!confirm("确定删除任务「" + t.name + "」？")) return;
+      D.tasks = D.tasks.filter(function(x){ return x.id !== t.id; });
+      closeDrawer(); commit();
+    };
+  }
+  function bindOffForm(o, box){
+    box.querySelectorAll("[data-field]").forEach(function(el){
+      var f = el.dataset.field;
+      el.addEventListener(el.type === "date" ? "change" : "input", function(){
+        o[f] = el.value;
+        if (pd(o.end) < pd(o.start)) o.end = o.start;
+        dirty = true; writeStore(); render();
+        document.getElementById("d-title").textContent = o.name;
+      });
+    });
+    var del = box.querySelector('[data-act="del-off"]');
+    if (del) del.onclick = function(){
+      if (!confirm("确定删除赛程节点「" + o.name + "」？")) return;
+      D.official = D.official.filter(function(x){ return x.name !== o.name; });
+      closeDrawer(); commit();
+    };
+  }
+
+  function addTask(){
+    var arm = (M === "arm") ? S.id : (filt !== "all" ? filt : "misc");
+    var owners = (M === "owner") ? [S.name] : [];
+    var t = {
+      id:newId(), name:"新任务", arm:arm, owners:owners, helpers:[],
+      start:iso(Date.now()), end:iso(Date.now() + 7*DAY),
+      status:"plan", src:"手动添加", note:""
+    };
+    D.tasks.push(t);
+    commit();
+    openDrawer("task", t.id);
+    var inp = document.querySelector('.frm input[data-field="name"]');
+    if (inp) { inp.focus(); inp.select(); }
+  }
+  function addOfficial(){
+    var n = "新赛程节点", i = 1;
+    while (findOfficial(n)) { n = "新赛程节点 " + (++i); }
+    var d0 = iso(Date.now());
+    D.official.push({ name:n, start:d0, end:d0 });
+    commit();
+    openDrawer("official", n);
+  }
+
+  function exportJson(){
+    var out = { season:D.season, arms:D.arms, official:D.official, org:D.org, tasks:D.tasks };
+    var blob = new Blob([JSON.stringify(out, null, 2)], { type:"application/json;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "数据.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 3000);
+  }
+  function importJson(file){
+    var fr = new FileReader();
+    fr.onload = function(){
+      try {
+        var o = JSON.parse(fr.result);
+        if (!o.tasks || !o.arms) throw new Error("缺少 tasks / arms 字段");
+        D = { season:o.season || D.season, arms:o.arms, official:o.official || [], org:o.org || [], tasks:o.tasks };
+        filt = "all";
+        commit();
+        alert("导入成功，共 " + D.tasks.length + " 条任务。");
+      } catch(e){ alert("导入失败：" + e.message); }
+    };
+    fr.readAsText(file, "utf-8");
+  }
+
+  function bindAct(el){
+    el.onclick = function(){
+      var a = el.dataset.act;
+      if (a === "edit") { state.edit = !state.edit; renderDrawer(); render(); }
+      else if (a === "add") addTask();
+      else if (a === "add-off") addOfficial();
+      else if (a === "export") exportJson();
+      else if (a === "view-timeline") { mm.view = "timeline"; render(); }
+      else if (a === "view-mind") { mm.view = "mind"; render(); }
+      else if (a === "mm-arm") { mm.groupBy = "arm"; render(); }
+      else if (a === "mm-range-tasks") { mm.range = "tasks"; mm.zoom = 1; render(); }
+      else if (a === "mm-range-season") { mm.range = "season"; mm.zoom = 1; render(); }
+      else if (a === "mm-month") { mm.groupBy = "month"; render(); }
+      else if (a === "mm-detail") { mm.showDetail = !mm.showDetail; render(); }
+      else if (a === "mm-note") { mm.showNote = !mm.showNote; mm.showDetail = mm.showDetail || mm.showNote; render(); }
+      else if (a === "mm-in") { mm.zoom = Math.min(2, Math.round((mm.zoom + 0.1) * 10) / 10); render(); }
+      else if (a === "mm-out") { mm.zoom = Math.max(0.3, Math.round((mm.zoom - 0.1) * 10) / 10); render(); }
+      else if (a === "mm-fit") {
+        var sc = document.querySelector(".mm-scroll");
+        if (sc && mm.totalW) mm.zoom = Math.max(0.35, Math.min(1.3, (sc.clientWidth - 10) / mm.totalW));
+        render();
+      }
+      else if (a === "close") closeDrawer();
+      else if (a === "reset") {
+        if (!confirm("放弃浏览器内的修改，恢复成文件里生成的数据？")) return;
+        dropStore(); D = BASE; dirty = false; stale = null; closeDrawer(); render();
+      }
+      else if (a === "use-stale") { D = stale.data; stale = null; commit(); }
+      else if (a === "drop-stale") { dropStore(); stale = null; render(); }
+    };
+  }
+
+  function afterRender(){
+    document.querySelectorAll("[data-act]").forEach(bindAct);
+    document.querySelectorAll("[data-off]").forEach(function(el){
+      if (el.classList.contains("ms")) return;
+      el.onclick = function(){ if (state.edit) openDrawer("official", el.dataset.off); };
+    });
+    document.querySelectorAll("[data-task]").forEach(function(el){
+      if (el.tagName === "A" || el.classList.contains("bar")) return;
+      el.onclick = function(ev){
+        ev.stopPropagation();
+        var node = el.closest(".tlm-node");
+        if (node && !state.edit) { node.classList.toggle("open"); return; }
+        openDrawer("task", el.dataset.task);
+      };
+    });
+    var imp = document.getElementById("imp");
+    if (imp) imp.onchange = function(){ if (imp.files && imp.files[0]) importJson(imp.files[0]); imp.value = ""; };
+
+    document.querySelectorAll("[data-go]").forEach(function(el){
+      el.onclick = function(ev){
+        ev.preventDefault();
+        var v = el.dataset.go, i = v.indexOf(":");
+        if (i < 0) go(v);
+        else go(v.slice(0, i), v.slice(i + 1));
+      };
+    });
+  }
+
+  document.getElementById("d-close").onclick = closeDrawer;
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeDrawer(); });
+
+  function render(){
+    if (M === "index") renderIndex();
+    else if (M === "season") renderSeason();
+    else if (M === "gantt") renderGantt("按兵种的甘特图",
+      "每个兵种一条独立泳道，共 " + D.tasks.length + " 条任务。可直观看出各组开发节奏、并行程度与空档。");
+    else renderScope();
+    afterRender();
+  }
+
+  // 单文件版：按地址栏 # 片段恢复上次的视图（刷新 / 浏览器后退不会跳回总览）
+  if (SINGLE) {
+    applyRoute();
+    window.addEventListener("hashchange", function(){ applyRoute(); render(); });
+  }
+
+  try { render(); } catch (e) {
+    document.getElementById("app").innerHTML =
+      '<pre style="padding:24px;color:#b3161f;background:#fff;font:13px/1.8 Consolas,monospace;white-space:pre-wrap">' +
+      '页面渲染失败：' + (e && e.stack ? e.stack : String(e)) + '</pre>';
+  }
+})();
+</script>
+</body>
+</html>
